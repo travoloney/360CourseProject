@@ -47,8 +47,10 @@ body {
 
 #drawingCanvas {
     border: 2px solid black;
-    margin-top: 100px;
     background: white;
+    width: 100%;
+    max-width: 500px;
+    height: auto;
     touch-action: none; /* [Lucky] Prevents browser touch gestures on canvas */
 }
 

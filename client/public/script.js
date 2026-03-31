@@ -8,12 +8,16 @@ window.onload = () => {
 
     const thread = document.getElementById("thread"); // connect the thread to html thread object
 
-    const socket = setupSocket((receivedStrokes) => { // initialize a web socket 
+    const socket = setupSocket((receivedStrokes) => { // initialize a web socket
         const newCanvas = document.createElement("canvas"); // new canvas object to display drawing
         const newctx = newCanvas.getContext("2d");
 
-        newCanvas.width = 600;
-        newCanvas.height = 400;
+        // [Lucky] Dynamic size for received drawings — fits mobile screens
+        const threadWidth = thread.clientWidth - 20;
+        const displayWidth = Math.min(600, threadWidth);
+        const ratio = 400 / 600;
+        newCanvas.width = displayWidth;
+        newCanvas.height = displayWidth * ratio;
 
         renderStrokes(receivedStrokes, newctx);
 

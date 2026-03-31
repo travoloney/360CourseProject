@@ -1,28 +1,30 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
-<head>
+  <head>
+    <!-- [Lucky] Viewport meta for mobile responsiveness -->
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, user-scalable=no"
+    />
     <title>Sketchcord</title>
-    <link rel="stylesheet" href="style.css">
-</head>
-<body>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
     <h1>Sketchcord</h1>
 
     <div id="app">
+      <div id="thread"></div>
 
-        <div id="thread"></div>
-
-        <div id="messaging">
-            <h2>Draw your message</h2>
-            <canvas id="drawingCanvas"></canvas>
-            <div id="controls">
-                <button id="clearBtn">Clear</button>
-                <button id="sendBtn">Send</button>
-            </div>
+      <div id="messaging">
+        <h2>Draw your message</h2>
+        <canvas id="drawingCanvas"></canvas>
+        <div id="controls">
+          <button id="clearBtn">Clear</button>
+          <button id="sendBtn">Send</button>
         </div>
-
+      </div>
     </div>
 
     <script type="module" src="script.js"></script>
-
-</body>
+  </body>
 </html>

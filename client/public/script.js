@@ -21,6 +21,14 @@ window.onload = () => {
         thread.scrollTop = thread.scrollHeight;
     });
 
+    function resizeCanvas() {
+        canvas.width = canvas.clientWidth;
+        canvas.height = canvas.clientWidth * 0.6; // Keep aspect ratio
+    }
+
+    window.addEventListener("resize", resizeCanvas);
+    resizeCanvas();
+
     document.getElementById("clearBtn").onclick = () => { // event for clicking the clear button.
         canvasSystem.clear();
         console.log("Canvas cleared");

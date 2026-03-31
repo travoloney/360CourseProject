@@ -5,20 +5,24 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <h1>Sketchcord</h1>
 
-<h1>Sketchcord</h1>
+    <div id="app">
 
-<h2>Draw your message</h2>
+        <div id="thread"></div>
 
-<canvas id="drawingCanvas"></canvas>
+        <div id="messaging">
+            <h2>Draw your message</h2>
+            <canvas id="drawingCanvas"></canvas>
+            <div id="controls">
+                <button id="clearBtn">Clear</button>
+                <button id="sendBtn">Send</button>
+            </div>
+        </div>
 
-<div>
-    <button id="clearBtn">Clear</button>
-    <button id="sendBtn">Send</button>
-    <!-- <button id="testDisp">testDisp</button> -->
-</div>
+    </div>
 
-<script src="script.js"></script>
+    <script type="module" src="script.js"></script>
 
 </body>
 </html>

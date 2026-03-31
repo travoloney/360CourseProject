@@ -1,83 +1,38 @@
-const canvas = document.getElementById("drawingCanvas");
-const ctx = canvas.getContext("2d");
+import { setupCanvas } from "./canvas.js";
+import { setupSocket } from "./socket.js";
 
-canvas.width = 600;
-canvas.height = 400;
+window.onload = () => {
 
-let drawing = false;
-let strokes = []; // A way to store drawings
-//let testStrokes = []; // For testing, remove later
-let currentStroke = [];
+    const canvas = document.getElementById("drawingCanvas"); // connect the drawing canvas in the html to be modified
+    const canvasSystem = setupCanvas(canvas); // intitializes and adds event listeners to the canvas
 
-canvas.addEventListener("mousedown", startDrawing);
-canvas.addEventListener("mousemove", draw);
-canvas.addEventListener("mouseup", stopDrawing);
+    const thread = document.getElementById("thread"); // connect the thread to html thread object
 
-function startDrawing(e) {
-    drawing = true;
-    currentStroke = [];
+    const socket = setupSocket((receivedStrokes) => { // initialize a web socket 
+        const newCanvas = document.createElement("canvas"); // new canvas object to display drawing
+        const newctx = newCanvas.getContext("2d");
 
-    const point = getMousePos(e);
-    currentStroke.push(point);
-}
+        newCanvas.width = 600;
+        newCanvas.height = 400;
 
-function draw(e) {
-    if (!drawing) return;
+        renderStrokes(receivedStrokes, newctx);
 
-    const point = getMousePos(e);
-    currentStroke.push(point);
+        thread.appendChild(newCanvas);
+        thread.scrollTop = thread.scrollHeight;
+    });
 
-    ctx.lineWidth = 4;
-    ctx.lineCap = "round";
-    ctx.strokeStyle = "black";
+    document.getElementById("clearBtn").onclick = () => { // event for clicking the clear button.
+        canvasSystem.clear();
+        console.log("Canvas cleared");
+    };
 
-    const prev = currentStroke[currentStroke.length - 2];
-
-    ctx.beginPath();
-    ctx.moveTo(prev.x, prev.y);
-    ctx.lineTo(point.x, point.y);
-    ctx.stroke();
-}
-
-function stopDrawing() {
-    if (!drawing) return;
-
-    drawing = false;
-    strokes.push(currentStroke);
-}
-
-function getMousePos(e) {
-    const rect = canvas.getBoundingClientRect();
-
-    return {
-        x: e.clientX - rect.left,
-        y: e.clientY - rect.top
+    document.getElementById("sendBtn").onclick = () => { // event for clicking the send button
+        socket.send(canvasSystem.getStrokes());
+        canvasSystem.clear();
     };
 }
 
-document.getElementById("clearBtn").onclick = () => {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    console.log("Canvas cleared");
-    strokes = [];
-};
-
-document.getElementById("sendBtn").onclick = () => {
-    console.log("Drawing data:", strokes);
-    //testStrokes = strokes; // Testing only, remove this line
-    // Incomplete, need to send this to server
-    // Send through something like websockets or http
-};
-
-// Test display, remove later
-document.getElementById("testDisp").onclick = () => {
-    console.log("Displaying test data");
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    renderStrokes(testStrokes);
-    // Incomplete, need to send this to server
-    // Send through something like websockets or http
-};
-
-function renderStrokes(strokesData) { // Call to display received messages using strokes
+function renderStrokes(strokesData , ctx) { // Call to display received messages using strokes
     strokesData.forEach(stroke => {
         for (let i = 1; i < stroke.length; i++) {
             const prev = stroke[i-1];

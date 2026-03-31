@@ -1,8 +1,9 @@
 body {
     font-family: Arial;
     text-align: center;
-    margin: 0;
     overflow: hidden;
+    margin: 0;
+    padding: 0;
 }
 
 #app {
@@ -40,12 +41,64 @@ body {
     margin-bottom: 10px;
     max-width: 80%;
     border: 1px solid black;
+    max-width: 100%; /* [Lucky] Thread canvases scale down on mobile */
+    height: auto; /* [Lucky] Maintain aspect ratio */
 }
 
 #drawingCanvas {
     border: 2px solid black;
+    margin-top: 100px;
     background: white;
-    width: 100%;
-    max-width: 500px;
-    height: auto;
+    touch-action: none; /* [Lucky] Prevents browser touch gestures on canvas */
+}
+
+/* [Lucky] MOBILE LAYOUT — responsive styles for screens under 768px */
+@media (max-width: 768px) {
+    h1 {
+        font-size: 1.4rem;
+        margin: 8px 0;
+    }
+
+    #app {
+        flex-direction: column;
+        height: auto;
+        min-height: 100vh;
+    }
+
+    /* [Lucky] Thread shrinks when empty, grows as messages arrive */
+    #thread {
+        width: auto;
+        min-height: 60px;
+        max-height: 35vh;
+        padding: 10px;
+        border-right: none;
+        border-bottom: 2px solid black;
+        border: 2px solid black;
+    }
+
+    /* [Lucky] Drawing area takes priority on mobile */
+    #messaging {
+        padding: 10px;
+        flex: 1;
+        justify-content: flex-start;
+    }
+
+    #messaging h2 {
+        font-size: 1.1rem;
+        margin: 5px 0;
+    }
+
+    #drawingCanvas {
+        margin-top: 5px; /* [Lucky] Reduced gap so canvas is closer to heading */
+        max-width: 100%;
+    }
+
+    #controls {
+        margin-top: 10px;
+    }
+
+    #controls button {
+        padding: 10px 24px;
+        font-size: 1rem;
+    }
 }

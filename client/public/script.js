@@ -59,6 +59,9 @@ window.onload = () => {
     if (!username || username.trim() === "") {
         username = "Anonymous";
     }
+
+    const userDisplay = document.getElementById("userDisplay");
+    userDisplay.textContent = `Your username: ${username}`;
 }
 
 function renderStrokes(strokesData , ctx) { // Call to display received messages using strokes

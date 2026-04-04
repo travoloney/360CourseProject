@@ -8,7 +8,8 @@ window.onload = () => {
 
     const thread = document.getElementById("thread"); // connect the thread to html thread object
 
-    const socket = setupSocket((receivedStrokes) => { // initialize a web socket
+    const socket = setupSocket((msg) => { // initialize a web socket
+        const { user, strokes } = msg; // Now sends username along with drawing
         const newCanvas = document.createElement("canvas"); // new canvas object to display drawing
         const newctx = newCanvas.getContext("2d");
 
@@ -19,9 +20,15 @@ window.onload = () => {
         newCanvas.width = displayWidth;
         newCanvas.height = displayWidth * ratio;
 
-        renderStrokes(receivedStrokes, newctx);
+        renderStrokes(strokes, newctx);
 
-        thread.appendChild(newCanvas);
+        // For displaying usernames
+        const label = document.createElement("div");
+        label.textContent = user;
+        label.className = "message-label";
+
+        thread.appendChild(label); // User
+        thread.appendChild(newCanvas); // Drawing
         thread.scrollTop = thread.scrollHeight;
     });
 
@@ -39,9 +46,19 @@ window.onload = () => {
     };
 
     document.getElementById("sendBtn").onclick = () => { // event for clicking the send button
-        socket.send(canvasSystem.getStrokes());
+        socket.send({
+            user: username,
+            strokes: canvasSystem.getStrokes()
+        }); // Changed this to send username along with drawing
         canvasSystem.clear();
     };
+
+    // Prompt user for name
+    let username = prompt("Enter your name");
+
+    if (!username || username.trim() === "") {
+        username = "Anonymous";
+    }
 }
 
 function renderStrokes(strokesData , ctx) { // Call to display received messages using strokes

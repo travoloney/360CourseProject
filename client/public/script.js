@@ -9,7 +9,7 @@ window.onload = () => {
     const thread = document.getElementById("thread"); // connect the thread to html thread object
 
     const socket = setupSocket((msg) => { // initialize a web socket
-        const { user, strokes } = msg; // Now sends username along with drawing
+        const { user, strokes, color } = msg; // Now sends username along with drawing
         const newCanvas = document.createElement("canvas"); // new canvas object to display drawing
         const newctx = newCanvas.getContext("2d");
 
@@ -25,6 +25,7 @@ window.onload = () => {
         // For displaying usernames
         const label = document.createElement("div");
         label.textContent = user;
+        label.style.color = color || "#444";
         label.className = "message-label";
 
         thread.appendChild(label); // User
@@ -48,13 +49,15 @@ window.onload = () => {
     document.getElementById("sendBtn").onclick = () => { // event for clicking the send button
         socket.send({
             user: username,
+            color: userColor,
             strokes: canvasSystem.getStrokes()
-        }); // Changed this to send username along with drawing
+        }); // Changed this to send username and usercolor along with drawing
         canvasSystem.clear();
     };
 
-    // Prompt user for name
+    // Prompt user for name and color
     let username = prompt("Enter your name");
+    let userColor = prompt("Enter color");
 
     if (!username || username.trim() === "") {
         username = "Anonymous";
@@ -62,6 +65,7 @@ window.onload = () => {
 
     const userDisplay = document.getElementById("userDisplay");
     userDisplay.textContent = `Your username: ${username}`;
+    userDisplay.style.color = userColor;
 }
 
 function renderStrokes(strokesData , ctx) { // Call to display received messages using strokes

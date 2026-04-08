@@ -2,6 +2,7 @@
 export function setupSocket(onMessage){
 
     const socket = new WebSocket("ws://13.58.149.115:8080");
+    //const socket = new WebSocket("ws://localhost:8080");
 
     socket.onopen = () => {
         console.log("Connected to server!");

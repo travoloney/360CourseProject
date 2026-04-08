@@ -8,7 +8,8 @@ window.onload = () => {
 
     const thread = document.getElementById("thread"); // connect the thread to html thread object
 
-    const socket = setupSocket((receivedStrokes) => { // initialize a web socket
+    const socket = setupSocket((msg) => { // initialize a web socket
+        const { user, strokes, color } = msg; // Now sends username along with drawing
         const newCanvas = document.createElement("canvas"); // new canvas object to display drawing
         const newctx = newCanvas.getContext("2d");
 
@@ -19,9 +20,16 @@ window.onload = () => {
         newCanvas.width = displayWidth;
         newCanvas.height = displayWidth * ratio;
 
-        renderStrokes(receivedStrokes, newctx);
+        renderStrokes(strokes, newctx);
 
-        thread.appendChild(newCanvas);
+        // For displaying usernames
+        const label = document.createElement("div");
+        label.textContent = user;
+        label.style.color = color || "#444";
+        label.className = "message-label";
+
+        thread.appendChild(label); // User
+        thread.appendChild(newCanvas); // Drawing
         thread.scrollTop = thread.scrollHeight;
     });
 
@@ -39,9 +47,30 @@ window.onload = () => {
     };
 
     document.getElementById("sendBtn").onclick = () => { // event for clicking the send button
-        socket.send(canvasSystem.getStrokes());
+        socket.send({
+            user: username,
+            color: userColor,
+            strokes: canvasSystem.getStrokes()
+        }); // Changed this to send username and usercolor along with drawing
         canvasSystem.clear();
     };
+
+    // Prompt user for name and color
+    let username = "";
+    do
+    {
+        username = prompt("Enter your name (max 10 characters)");
+    } while (username.length > 10)
+    
+    let userColor = prompt("Enter username color");
+
+    if (!username || username.trim() === "") {
+        username = "Anonymous";
+    }
+
+    const userDisplay = document.getElementById("userDisplay");
+    userDisplay.textContent = `Your username: ${username}`;
+    userDisplay.style.color = userColor;
 }
 
 function renderStrokes(strokesData , ctx) { // Call to display received messages using strokes

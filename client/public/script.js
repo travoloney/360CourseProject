@@ -56,8 +56,13 @@ window.onload = () => {
     };
 
     // Prompt user for name and color
-    let username = prompt("Enter your name");
-    let userColor = prompt("Enter color");
+    let username = "";
+    do
+    {
+        username = prompt("Enter your name (max 10 characters)");
+    } while (username.length > 10)
+    
+    let userColor = prompt("Enter username color");
 
     if (!username || username.trim() === "") {
         username = "Anonymous";

@@ -2,8 +2,8 @@
 // [Lucky] Updated to handle message history and username-tagged messages
 export function setupSocket(onMessage, onHistory){
 
-    // [Lucky] Use localhost for local testing, change to server IP for production
-    const socket = new WebSocket("ws://localhost:8080");
+    const socket = new WebSocket("ws://13.58.149.115:8080");
+    //const socket = new WebSocket("ws://localhost:8080");
 
     socket.onopen = () => {
         console.log("Connected to server!");

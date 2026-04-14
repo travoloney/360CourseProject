@@ -51,10 +51,14 @@ function saveDB() {
 
 // [Lucky] Create or get a user profile
 function getOrCreateUser(username) {
-    const existing = db.exec("SELECT * FROM users WHERE username = ?", [username]);
-    if (existing.length > 0 && existing[0].values.length > 0) {
-        return { id: existing[0].values[0][0], username: existing[0].values[0][1] };
+    const stmt = db.prepare("SELECT * FROM users WHERE username = ?");
+    stmt.bind([username]);
+    if (stmt.step()) {
+        const row = stmt.get();
+        stmt.free();
+        return { id: row[0], username: row[1] };
     }
+    stmt.free();
     db.run("INSERT INTO users (username) VALUES (?)", [username]);
     saveDB();
     const result = db.exec("SELECT last_insert_rowid()");
@@ -71,18 +75,20 @@ function saveMessage(username, strokes) {
 
 // [Lucky] Get message history (last 50 messages)
 function getMessages(limit = 50) {
-    const result = db.exec(
-        `SELECT id, username, strokes, created_at FROM messages ORDER BY id DESC LIMIT ?`,
-        [limit]
-    );
-    if (result.length === 0) return [];
-
-    return result[0].values.map(row => ({
-        id: row[0],
-        username: row[1],
-        strokes: JSON.parse(row[2]),
-        created_at: row[3]
-    })).reverse(); // [Lucky] Reverse so oldest first
+    const stmt = db.prepare("SELECT id, username, strokes, created_at FROM messages ORDER BY id DESC LIMIT ?");
+    stmt.bind([limit]);
+    const messages = [];
+    while (stmt.step()) {
+        const row = stmt.get();
+        messages.push({
+            id: row[0],
+            username: row[1],
+            strokes: JSON.parse(row[2]),
+            created_at: row[3]
+        });
+    }
+    stmt.free();
+    return messages.reverse(); // [Lucky] Reverse so oldest first
 }
 
 module.exports = { initDB, getOrCreateUser, saveMessage, getMessages };

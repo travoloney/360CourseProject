@@ -11,11 +11,22 @@ window.onload = () => {
     const canvas = document.getElementById("drawingCanvas");
     const thread = document.getElementById("thread");
 
+    // [Lucky] Auto-login if user was already logged in (survives page reloads)
+    const savedUser = sessionStorage.getItem("sketchcord_user");
+    if (savedUser) {
+        currentUser = savedUser;
+        document.getElementById("displayName").textContent = savedUser;
+        loginDiv.style.display = "none";
+        appDiv.style.display = "flex";
+        initApp();
+    }
+
     // [Lucky] Join button — registers user and shows the app
     document.getElementById("joinBtn").onclick = () => {
         const username = document.getElementById("usernameInput").value.trim();
         if (!username) return;
         currentUser = username;
+        sessionStorage.setItem("sketchcord_user", username); // [Lucky] Persist login
         document.getElementById("displayName").textContent = username;
         loginDiv.style.display = "none";
         appDiv.style.display = "flex";

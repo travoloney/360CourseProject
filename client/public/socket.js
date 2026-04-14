@@ -1,11 +1,21 @@
     // Creating a client web socket to connect to port 8080
-export function setupSocket(onMessage){
+// [Lucky] Updated to handle message history and username-tagged messages
+export function setupSocket(onMessage, onHistory){
 
     const socket = new WebSocket("ws://13.58.149.115:8080");
     //const socket = new WebSocket("ws://localhost:8080");
 
     socket.onopen = () => {
         console.log("Connected to server!");
+    };
+
+    // [Lucky] Handle connection errors so they don't crash the app
+    socket.onerror = (err) => {
+        console.log("WebSocket error:", err);
+    };
+
+    socket.onclose = () => {
+        console.log("WebSocket disconnected");
     };
 
     socket.onmessage = async (e) => {
@@ -22,26 +32,16 @@ export function setupSocket(onMessage){
         try {
             const data = JSON.parse(text);
 
-            onMessage(data);
-            // const receivedStrokes = JSON.parse(text);
+            // [Lucky] Handle history payload from server on connect
+            if (data.type === "history") {
+                if (onHistory) onHistory(data.messages);
+                return;
+            }
 
-            // const newCanvas = document.createElement("canvas");
-            // const newctx = newCanvas.getContext("2d");
-
-            // newCanvas.width = 600;
-            // newCanvas.height = 400;
-
-            // renderStrokes(receivedStrokes, newctx);
-
-            // // append message to the thread
-            // document.getElementById("thread").appendChild(newCanvas);
-            // // thread scrolls to bottom
-            // thread.scrollTop = thread.scrollHeight;
-
-            // // clear the drawing pad after a message is sent.
-            // ctx.clearRect(0, 0, canvas.width, canvas.height);
-            // console.log("Canvas cleared");
-            // strokes = [];
+            // [Lucky] Handle regular drawing messages (must have username + strokes)
+            if (data.username && data.strokes) {
+                onMessage(data);
+            }
 
         } catch (err) {
             console.log("Ignored non-JSON message:", text);
@@ -49,6 +49,13 @@ export function setupSocket(onMessage){
     }
 
     return {
-    send: (data) => socket.send(JSON.stringify(data))
+    // [Lucky] Send now includes username with strokes
+    send: (username, strokes) => {
+        if (socket.readyState === WebSocket.OPEN) {
+            socket.send(JSON.stringify({ username, strokes }));
+        } else {
+            console.log("Socket not connected, message not sent");
+        }
+    }
     };
 }

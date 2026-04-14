@@ -1,47 +1,91 @@
 import { setupCanvas } from "./canvas.js";
 import { setupSocket } from "./socket.js";
 
+// [Lucky] Current logged-in username
+let currentUser = null;
+
 window.onload = () => {
 
-    const canvas = document.getElementById("drawingCanvas"); // connect the drawing canvas in the html to be modified
-    const canvasSystem = setupCanvas(canvas); // intitializes and adds event listeners to the canvas
+    const loginDiv = document.getElementById("login");
+    const appDiv = document.getElementById("app");
+    const canvas = document.getElementById("drawingCanvas");
+    const thread = document.getElementById("thread");
 
-    const thread = document.getElementById("thread"); // connect the thread to html thread object
+    // [Lucky] Join button — registers user and shows the app
+    document.getElementById("joinBtn").onclick = () => {
+        const username = document.getElementById("usernameInput").value.trim();
+        if (!username) return;
+        currentUser = username;
+        document.getElementById("displayName").textContent = username;
+        loginDiv.style.display = "none";
+        appDiv.style.display = "flex";
+        initApp();
+    };
 
-    const socket = setupSocket((receivedStrokes) => { // initialize a web socket
-        const newCanvas = document.createElement("canvas"); // new canvas object to display drawing
+    // [Lucky] Allow pressing Enter to join
+    document.getElementById("usernameInput").addEventListener("keydown", (e) => {
+        if (e.key === "Enter") document.getElementById("joinBtn").click();
+    });
+
+    function initApp() {
+        const canvasSystem = setupCanvas(canvas);
+
+        // [Lucky] Called when a new drawing message arrives via WebSocket
+        const socket = setupSocket((message) => {
+            addMessageToThread(message.username, message.strokes);
+        }, (history) => {
+            // [Lucky] Called on connect — renders saved message history
+            history.forEach(msg => {
+                addMessageToThread(msg.username, msg.strokes);
+            });
+        });
+
+        function resizeCanvas() {
+            canvas.width = canvas.clientWidth;
+            canvas.height = canvas.clientWidth * 0.6;
+        }
+
+        window.addEventListener("resize", resizeCanvas);
+        resizeCanvas();
+
+        document.getElementById("clearBtn").onclick = () => {
+            canvasSystem.clear();
+            console.log("Canvas cleared");
+        };
+
+        document.getElementById("sendBtn").onclick = () => {
+            const strokes = canvasSystem.getStrokes();
+            if (strokes.length === 0) return; // [Lucky] Don't send empty drawings
+            socket.send(currentUser, strokes);
+            canvasSystem.clear();
+        };
+    }
+
+    // [Lucky] Adds a drawing message with username label to the thread
+    function addMessageToThread(username, strokes) {
+        const wrapper = document.createElement("div");
+        wrapper.className = "message-wrapper";
+
+        const label = document.createElement("div");
+        label.className = "message-label";
+        label.textContent = username;
+
+        const newCanvas = document.createElement("canvas");
         const newctx = newCanvas.getContext("2d");
 
-        // [Lucky] Dynamic size for received drawings — fits mobile screens
         const threadWidth = thread.clientWidth - 20;
         const displayWidth = Math.min(600, threadWidth);
         const ratio = 400 / 600;
         newCanvas.width = displayWidth;
         newCanvas.height = displayWidth * ratio;
 
-        renderStrokes(receivedStrokes, newctx);
+        renderStrokes(strokes, newctx);
 
-        thread.appendChild(newCanvas);
+        wrapper.appendChild(label);
+        wrapper.appendChild(newCanvas);
+        thread.appendChild(wrapper);
         thread.scrollTop = thread.scrollHeight;
-    });
-
-    function resizeCanvas() {
-        canvas.width = canvas.clientWidth;
-        canvas.height = canvas.clientWidth * 0.6; // Keep aspect ratio
     }
-
-    window.addEventListener("resize", resizeCanvas);
-    resizeCanvas();
-
-    document.getElementById("clearBtn").onclick = () => { // event for clicking the clear button.
-        canvasSystem.clear();
-        console.log("Canvas cleared");
-    };
-
-    document.getElementById("sendBtn").onclick = () => { // event for clicking the send button
-        socket.send(canvasSystem.getStrokes());
-        canvasSystem.clear();
-    };
 }
 
 function renderStrokes(strokesData , ctx) { // Call to display received messages using strokes

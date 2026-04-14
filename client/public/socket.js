@@ -1,5 +1,6 @@
     // Creating a client web socket to connect to port 8080
-export function setupSocket(onMessage){
+// [Lucky] Updated to handle message history and username-tagged messages
+export function setupSocket(onMessage, onHistory){
 
     const socket = new WebSocket("ws://13.58.149.115:8080");
 
@@ -21,26 +22,13 @@ export function setupSocket(onMessage){
         try {
             const data = JSON.parse(text);
 
+            // [Lucky] Handle history payload from server on connect
+            if (data.type === "history") {
+                onHistory(data.messages);
+                return;
+            }
+
             onMessage(data);
-            // const receivedStrokes = JSON.parse(text);
-
-            // const newCanvas = document.createElement("canvas");
-            // const newctx = newCanvas.getContext("2d");
-
-            // newCanvas.width = 600;
-            // newCanvas.height = 400;
-
-            // renderStrokes(receivedStrokes, newctx);
-
-            // // append message to the thread
-            // document.getElementById("thread").appendChild(newCanvas);
-            // // thread scrolls to bottom
-            // thread.scrollTop = thread.scrollHeight;
-
-            // // clear the drawing pad after a message is sent.
-            // ctx.clearRect(0, 0, canvas.width, canvas.height);
-            // console.log("Canvas cleared");
-            // strokes = [];
 
         } catch (err) {
             console.log("Ignored non-JSON message:", text);
@@ -48,6 +36,7 @@ export function setupSocket(onMessage){
     }
 
     return {
-    send: (data) => socket.send(JSON.stringify(data))
+    // [Lucky] Send now includes username with strokes
+    send: (username, strokes) => socket.send(JSON.stringify({ username, strokes }))
     };
 }

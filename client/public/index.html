@@ -12,7 +12,21 @@
   <body>
     <h1>Sketchcord</h1>
 
-    <div id="app">
+    <!-- [Lucky] Username login screen — shown before chat -->
+    <div id="login">
+      <h2>Enter your username</h2>
+      <input
+        type="text"
+        id="usernameInput"
+        placeholder="Username"
+        maxlength="20"
+      />
+      <button id="joinBtn">Join</button>
+    </div>
+
+    <div id="app" style="display: none">
+      <!-- [Lucky] Show logged-in username -->
+      <div id="userBar">Logged in as: <span id="displayName"></span></div>
       <div id="thread"></div>
 
       <div id="messaging">

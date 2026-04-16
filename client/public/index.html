@@ -1,7 +1,7 @@
 <!doctype html>
 <html>
   <head>
-    <!-- [Lucky] Viewport meta for mobile responsiveness -->
+    <!-- Viewport meta for mobile responsiveness -->
     <meta
       name="viewport"
       content="width=device-width, initial-scale=1.0, user-scalable=no"
@@ -12,7 +12,7 @@
   <body>
     <h1>Sketchcord</h1>
 
-    <!-- [Lucky] Username login screen — shown before chat -->
+    <!-- Username login screen — shown before chat -->
     <div id="login">
       <h2>Enter your username</h2>
       <input
@@ -21,11 +21,14 @@
         placeholder="Username"
         maxlength="20"
       />
+      <!--  Color picker for username and drawing color -->
+      <label for="colorInput">Pick your color:</label>
+      <input type="color" id="colorInput" value="#000000" />
       <button id="joinBtn">Join</button>
     </div>
 
     <div id="app" style="display: none">
-      <!-- [Lucky] Show logged-in username -->
+      <!-- Show logged-in username -->
       <div id="userBar">Logged in as: <span id="displayName"></span></div>
       <div id="thread"></div>
 

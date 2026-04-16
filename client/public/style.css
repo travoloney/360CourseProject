@@ -57,8 +57,8 @@ body {
     margin-bottom: 10px;
     max-width: 80%;
     border: 1px solid black;
-    max-width: 100%; /* [Lucky] Thread canvases scale down on mobile */
-    height: auto; /* [Lucky] Maintain aspect ratio */
+    max-width: 100%; /* Thread canvases scale down on mobile */
+    height: auto; /* Maintain aspect ratio */
 }
 
 #drawingCanvas {
@@ -68,10 +68,10 @@ body {
     max-width: 500px;
     max-height: 60vh;
     height: auto;
-    touch-action: none; /* [Lucky] Prevents browser touch gestures on canvas */
+    touch-action: none; /* Prevents browser touch gestures on canvas */
 }
 
-/* [Lucky] MOBILE LAYOUT — responsive styles for screens under 768px */
+/* MOBILE LAYOUT — responsive styles for screens under 768px */
 @media (max-width: 768px) {
     h1 {
         font-size: 1.4rem;
@@ -84,7 +84,7 @@ body {
         min-height: 100vh;
     }
 
-    /* [Lucky] Thread shrinks when empty, grows as messages arrive */
+    /* Thread shrinks when empty, grows as messages arrive */
     #thread {
         width: auto;
         min-height: 60px;
@@ -95,7 +95,7 @@ body {
         border: 2px solid black;
     }
 
-    /* [Lucky] Drawing area takes priority on mobile */
+    /* Drawing area takes priority on mobile */
     #messaging {
         padding: 10px;
         flex: 1;
@@ -108,7 +108,7 @@ body {
     }
 
     #drawingCanvas {
-        margin-top: 5px; /* [Lucky] Reduced gap so canvas is closer to heading */
+        margin-top: 5px; /* Reduced gap so canvas is closer to heading */
         max-width: 100%;
     }
 
@@ -122,7 +122,7 @@ body {
     }
 }
 
-/* [Lucky] Login screen styles */
+/* Login screen styles */
 #login {
     display: flex;
     flex-direction: column;
@@ -145,6 +145,20 @@ body {
     text-align: center;
 }
 
+/* Color picker on login screen */
+#login label {
+    font-size: 1rem;
+    color: #333;
+}
+
+#colorInput {
+    width: 60px;
+    height: 40px;
+    border: 2px solid black;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
 #joinBtn {
     padding: 10px 30px;
     font-size: 1.1rem;
@@ -159,7 +173,7 @@ body {
     background: #45a049;
 }
 
-/* [Lucky] User bar — shows who is logged in */
+/* User bar — shows who is logged in */
 #userBar {
     width: 100%;
     background: #333;
@@ -172,7 +186,7 @@ body {
     z-index: 10;
 }
 
-/* [Lucky] Username label on each message in thread */
+/* Username label on each message in thread */
 .message-label {
     font-size: 0.8rem;
     color: #555;

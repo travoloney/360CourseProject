@@ -71,6 +71,11 @@ body {
     touch-action: none; /* [Lucky] Prevents browser touch gestures on canvas */
 }
 
+.color_button {
+    width: 30px;
+    height: 30px;
+}
+
 /* [Lucky] MOBILE LAYOUT — responsive styles for screens under 768px */
 @media (max-width: 768px) {
     h1 {

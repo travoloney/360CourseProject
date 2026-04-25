@@ -101,9 +101,11 @@ window.onload = () => {
 
 function renderStrokes(strokesData , ctx) { // Call to display received messages using strokes
     strokesData.forEach(stroke => {
-        for (let i = 1; i < stroke.length; i++) {
-            const prev = stroke[i-1];
-            const curr = stroke[i];
+        ctx.strokeStyle = stroke.color;
+
+        for (let i = 1; i < stroke.points.length; i++) {
+            const prev = stroke.points[i-1];
+            const curr = stroke.points[i];
 
             ctx.beginPath();
             ctx.moveTo(prev.x, prev.y);

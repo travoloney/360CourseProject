@@ -1,8 +1,9 @@
-
 export function setupCanvas(canvas){
     const ctx = canvas.getContext("2d");
 
-    // Dynamic canvas sizing — fits screen width on mobile
+    let currentColor = "#000000";
+
+    // [Lucky] Dynamic canvas sizing — fits screen width on mobile
     function resizeCanvas() {
         const parent = canvas.parentElement;
         const maxWidth = Math.min(600, parent.clientWidth - 20);
@@ -13,10 +14,12 @@ export function setupCanvas(canvas){
     }
 
     let drawing = false;
-    let strokes = [];
-    let currentStroke = [];
-    // Current drawing color — defaults to black
-    let currentColor = "#000000";
+    let strokes = [];  // A way to store drawings
+    //let testStrokes = []; // For testing, remove later
+    let currentStroke = {
+        color: currentColor,
+        points: []
+    };
 
     canvas.addEventListener("mousedown", startDrawing);
     canvas.addEventListener("mousemove", draw);
@@ -36,21 +39,26 @@ export function setupCanvas(canvas){
     function handleTouchStart(e) {
         e.preventDefault();
         drawing = true;
-        currentStroke = [];
+        currentStroke = {
+            color: currentColor,
+            points: []
+        };
         const point = getTouchPos(e);
-        currentStroke.push(point);
+        currentStroke.points.push(point);
     }
 
     function handleTouchDraw(e) {
         e.preventDefault();
         if (!drawing) return;
         const point = getTouchPos(e);
-        currentStroke.push(point);
+        currentStroke.points.push(point);
+
         ctx.lineWidth = 4;
         ctx.lineCap = "round";
-        // Use selected color for drawing
-        ctx.strokeStyle = currentColor;
-        const prev = currentStroke[currentStroke.length - 2];
+        ctx.strokeStyle = currentStroke.color;
+
+        const prev = currentStroke.points[currentStroke.points.length - 2];
+
         ctx.beginPath();
         ctx.moveTo(prev.x, prev.y);
         ctx.lineTo(point.x, point.y);
@@ -59,20 +67,25 @@ export function setupCanvas(canvas){
 
     function startDrawing(e) {
         drawing = true;
-        currentStroke = [];
+        currentStroke = {
+            color: currentColor,
+            points: []
+        };
         const point = getMousePos(e);
-        currentStroke.push(point);
+        currentStroke.points.push(point);
     }
 
     function draw(e) {
         if (!drawing) return;
         const point = getMousePos(e);
-        currentStroke.push(point);
+        currentStroke.points.push(point);
+
         ctx.lineWidth = 4;
         ctx.lineCap = "round";
-        // Use selected color for drawing
-        ctx.strokeStyle = currentColor;
-        const prev = currentStroke[currentStroke.length - 2];
+        ctx.strokeStyle = currentStroke.color;
+
+        const prev = currentStroke.points[currentStroke.points.length - 2];
+
         ctx.beginPath();
         ctx.moveTo(prev.x, prev.y);
         ctx.lineTo(point.x, point.y);
@@ -83,7 +96,7 @@ export function setupCanvas(canvas){
         if (!drawing) return;
         drawing = false;
         // Store color with each stroke so it renders correctly later
-        strokes.push({ points: currentStroke, color: currentColor });
+        strokes.push(currentStroke);
     }
 
     function getMousePos(e) {
@@ -95,14 +108,12 @@ export function setupCanvas(canvas){
     function redraw() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         strokes.forEach(stroke => {
-            const points = stroke.points || stroke;
-            const color = stroke.color || "#000000";
-            for (let i = 1; i < points.length; i++) {
-                const prev = points[i - 1];
-                const curr = points[i];
+            ctx.strokeStyle = stroke.color;
+            for (let i = 1; i < stroke.points.length; i++) {
+                const prev = stroke.points[i - 1];
+                const curr = stroke.points[i];
                 ctx.lineWidth = 4;
                 ctx.lineCap = "round";
-                ctx.strokeStyle = color;
                 ctx.beginPath();
                 ctx.moveTo(prev.x, prev.y);
                 ctx.lineTo(curr.x, curr.y);
@@ -113,6 +124,23 @@ export function setupCanvas(canvas){
 
     resizeCanvas();
     window.addEventListener("resize", resizeCanvas);
+
+    // [Trav] Onclick for color buttons
+    const colorButtons = document.querySelectorAll(".color_button");
+
+    colorButtons.forEach(btn =>{
+        btn.style.backgroundColor = btn.dataset.color;
+
+        btn.onclick = () => {
+            currentColor = btn.dataset.color;
+        };
+    });
+
+    const colorPicker = document.getElementById("colorPicker");
+
+    colorPicker.addEventListener("input", () => {
+        currentColor = colorPicker.value;
+    });
 
     return {
         getStrokes: () => strokes,

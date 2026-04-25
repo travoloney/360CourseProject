@@ -71,7 +71,16 @@ body {
     touch-action: none; /* Prevents browser touch gestures on canvas */
 }
 
+<<<<<<< HEAD
 /* MOBILE LAYOUT — responsive styles for screens under 768px */
+=======
+.color_button {
+    width: 30px;
+    height: 30px;
+}
+
+/* [Lucky] MOBILE LAYOUT — responsive styles for screens under 768px */
+>>>>>>> origin/main
 @media (max-width: 768px) {
     h1 {
         font-size: 1.4rem;

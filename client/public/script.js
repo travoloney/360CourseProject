@@ -113,16 +113,14 @@ window.onload = () => {
 
 function renderStrokes(strokesData, ctx) {
     strokesData.forEach(stroke => {
-        // Support both new format {points, color} and old format [points]
-        const points = stroke.points || stroke;
-        const color = stroke.color || "#000000";
-        for (let i = 1; i < points.length; i++) {
-            const prev = points[i-1];
-            const curr = points[i];
+        ctx.strokeStyle = stroke.color;
+
+        for (let i = 1; i < stroke.points.length; i++) {
+            const prev = stroke.points[i-1];
+            const curr = stroke.points[i];
+
             ctx.lineWidth = 4;
             ctx.lineCap = "round";
-            // Render each stroke in its original color
-            ctx.strokeStyle = color;
             ctx.beginPath();
             ctx.moveTo(prev.x, prev.y);
             ctx.lineTo(curr.x, curr.y);

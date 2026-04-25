@@ -14,7 +14,7 @@ body {
 
 /* LEFT SIDE */
 #thread {
-    
+
     flex: 1.5;
     min-width: 250px;
     max-width: 50%;
@@ -125,4 +125,62 @@ body {
         padding: 10px 24px;
         font-size: 1rem;
     }
+}
+
+/* [Lucky] Login screen styles */
+#login {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 60vh;
+    gap: 15px;
+}
+
+#login h2 {
+    margin-bottom: 5px;
+}
+
+#usernameInput {
+    padding: 10px 15px;
+    font-size: 1.1rem;
+    border: 2px solid black;
+    border-radius: 4px;
+    width: 220px;
+    text-align: center;
+}
+
+#joinBtn {
+    padding: 10px 30px;
+    font-size: 1.1rem;
+    cursor: pointer;
+    border: 2px solid black;
+    background: #4CAF50;
+    color: white;
+    border-radius: 4px;
+}
+
+#joinBtn:hover {
+    background: #45a049;
+}
+
+/* [Lucky] User bar — shows who is logged in */
+#userBar {
+    width: 100%;
+    background: #333;
+    color: white;
+    padding: 8px;
+    font-size: 0.9rem;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 10;
+}
+
+/* [Lucky] Username label on each message in thread */
+.message-label {
+    font-size: 0.8rem;
+    color: #555;
+    margin-bottom: 2px;
+    text-align: left;
 }

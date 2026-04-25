@@ -1,6 +1,6 @@
 
 const ws = require("ws") // web socket
-// [Lucky] Added Express for REST API and database for storage
+// Added Express for REST API and database for storage
 const express = require("express");
 const cors = require("cors");
 const { initDB, getOrCreateUser, saveMessage, getMessages } = require("./database");
@@ -21,13 +21,13 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// [Lucky] REST endpoint — get message history
+// REST endpoint — get message history
 app.get("/api/messages", (req, res) => {
     const messages = getMessages();
     res.json(messages);
 });
 
-// [Lucky] REST endpoint — create or get user profile
+// REST endpoint — create or get user profile
 app.post("/api/users", (req, res) => {
     const { username } = req.body;
     if (!username || typeof username !== "string" || username.trim().length === 0) {
@@ -37,7 +37,7 @@ app.post("/api/users", (req, res) => {
     res.json(user);
 });
 
-// [Lucky] Start Express on port 3000, then start WebSocket server
+// Start Express on port 3000, then start WebSocket server
 initDB().then(() => {
     const server = app.listen(3000, () => {
         console.log("REST API running on http://localhost:3000");
@@ -48,11 +48,11 @@ initDB().then(() => {
     function messageHandle(data) { // message event
         console.log("Received: ", data.toString());
 
-        // [Lucky] Parse message and save to database
+        // Parse message and save to database with color
         try {
             const parsed = JSON.parse(data.toString());
             if (parsed.username && parsed.strokes) {
-                saveMessage(parsed.username, parsed.strokes);
+                saveMessage(parsed.username, parsed.strokes, parsed.color);
             }
         } catch (err) {
             console.log("Could not save message:", err.message);
@@ -80,7 +80,7 @@ wss.on("connection" , connectionHandle)
     function connectionHandle(socket) { // connection event
         console.log("Client Connected!");
 
-        // [Lucky] Send message history to newly connected client
+        // Send message history to newly connected client
         const history = getMessages();
         if (history.length > 0) {
             socket.send(JSON.stringify({ type: "history", messages: history }));

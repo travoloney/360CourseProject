@@ -1,8 +1,9 @@
 import { setupCanvas } from "./canvas.js";
 import { setupSocket } from "./socket.js";
 
-// [Lucky] Current logged-in username
+// Current logged-in username and color
 let currentUser = null;
+let currentColor = "#000000";
 
 window.onload = () => {
 
@@ -11,43 +12,51 @@ window.onload = () => {
     const canvas = document.getElementById("drawingCanvas");
     const thread = document.getElementById("thread");
 
-    // [Lucky] Auto-login if user was already logged in (survives page reloads)
+    // Auto-login if user was already logged in (survives page reloads)
     const savedUser = sessionStorage.getItem("sketchcord_user");
+    const savedColor = sessionStorage.getItem("sketchcord_color");
     if (savedUser) {
         currentUser = savedUser;
+        currentColor = savedColor || "#000000";
         document.getElementById("displayName").textContent = savedUser;
+        document.getElementById("displayName").style.color = currentColor;
         loginDiv.style.display = "none";
         appDiv.style.display = "flex";
         initApp();
     }
 
-    // [Lucky] Join button — registers user and shows the app
+    // Join button — registers user and shows the app
     document.getElementById("joinBtn").onclick = () => {
         const username = document.getElementById("usernameInput").value.trim();
         if (!username) return;
         currentUser = username;
-        sessionStorage.setItem("sketchcord_user", username); // [Lucky] Persist login
+        currentColor = document.getElementById("colorInput").value;
+        sessionStorage.setItem("sketchcord_user", username);
+        sessionStorage.setItem("sketchcord_color", currentColor);
         document.getElementById("displayName").textContent = username;
+        document.getElementById("displayName").style.color = currentColor;
         loginDiv.style.display = "none";
         appDiv.style.display = "flex";
         initApp();
     };
 
-    // [Lucky] Allow pressing Enter to join
+    // Allow pressing Enter to join
     document.getElementById("usernameInput").addEventListener("keydown", (e) => {
         if (e.key === "Enter") document.getElementById("joinBtn").click();
     });
 
     function initApp() {
         const canvasSystem = setupCanvas(canvas);
+        // Set the drawing color to match user's chosen color
+        canvasSystem.setColor(currentColor);
 
-        // [Lucky] Called when a new drawing message arrives via WebSocket
+        // Called when a new drawing message arrives via WebSocket
         const socket = setupSocket((message) => {
-            addMessageToThread(message.username, message.strokes);
+            addMessageToThread(message.username, message.strokes, message.color);
         }, (history) => {
-            // [Lucky] Called on connect — renders saved message history
+            // Called on connect — renders saved message history
             history.forEach(msg => {
-                addMessageToThread(msg.username, msg.strokes);
+                addMessageToThread(msg.username, msg.strokes, msg.color);
             });
         });
 
@@ -66,20 +75,23 @@ window.onload = () => {
 
         document.getElementById("sendBtn").onclick = () => {
             const strokes = canvasSystem.getStrokes();
-            if (strokes.length === 0) return; // [Lucky] Don't send empty drawings
-            socket.send(currentUser, strokes);
+            if (strokes.length === 0) return;
+            // Send color along with username and strokes
+            socket.send(currentUser, strokes, currentColor);
             canvasSystem.clear();
         };
     }
 
-    // [Lucky] Adds a drawing message with username label to the thread
-    function addMessageToThread(username, strokes) {
+    // Adds a drawing message with colored username label to the thread
+    function addMessageToThread(username, strokes, color) {
         const wrapper = document.createElement("div");
         wrapper.className = "message-wrapper";
 
         const label = document.createElement("div");
         label.className = "message-label";
         label.textContent = username;
+        // Display username in their chosen color
+        label.style.color = color || "#444";
 
         const newCanvas = document.createElement("canvas");
         const newctx = newCanvas.getContext("2d");
@@ -99,7 +111,7 @@ window.onload = () => {
     }
 }
 
-function renderStrokes(strokesData , ctx) { // Call to display received messages using strokes
+function renderStrokes(strokesData, ctx) {
     strokesData.forEach(stroke => {
         ctx.strokeStyle = stroke.color;
 
@@ -107,6 +119,8 @@ function renderStrokes(strokesData , ctx) { // Call to display received messages
             const prev = stroke.points[i-1];
             const curr = stroke.points[i];
 
+            ctx.lineWidth = 4;
+            ctx.lineCap = "round";
             ctx.beginPath();
             ctx.moveTo(prev.x, prev.y);
             ctx.lineTo(curr.x, curr.y);

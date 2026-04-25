@@ -1,7 +1,7 @@
 export function setupCanvas(canvas){
     const ctx = canvas.getContext("2d");
 
-    let currentColor = "black";
+    let currentColor = "#000000";
 
     // [Lucky] Dynamic canvas sizing — fits screen width on mobile
     function resizeCanvas() {
@@ -10,7 +10,7 @@ export function setupCanvas(canvas){
         const ratio = 400 / 600;
         canvas.width = maxWidth;
         canvas.height = maxWidth * ratio;
-        redraw(); // [Lucky] Redraw strokes after resize so drawings aren't lost
+        redraw();
     }
 
     let drawing = false;
@@ -25,22 +25,17 @@ export function setupCanvas(canvas){
     canvas.addEventListener("mousemove", draw);
     canvas.addEventListener("mouseup", stopDrawing);
 
-    // [Lucky] Touch events for mobile support
+    // Touch events for mobile support
     canvas.addEventListener("touchstart", handleTouchStart, { passive: false });
     canvas.addEventListener("touchmove", handleTouchDraw, { passive: false });
     canvas.addEventListener("touchend", stopDrawing);
 
-    // [Lucky] Converts touch event to mouse-like position
     function getTouchPos(e) {
         const rect = canvas.getBoundingClientRect();
         const touch = e.touches[0];
-        return {
-            x: touch.clientX - rect.left,
-            y: touch.clientY - rect.top
-        };
+        return { x: touch.clientX - rect.left, y: touch.clientY - rect.top };
     }
 
-    // [Lucky] Touch start handler — prevents scrolling while drawing
     function handleTouchStart(e) {
         e.preventDefault();
         drawing = true;
@@ -52,11 +47,9 @@ export function setupCanvas(canvas){
         currentStroke.points.push(point);
     }
 
-    // [Lucky] Touch move handler — draws on canvas via touch
     function handleTouchDraw(e) {
         e.preventDefault();
         if (!drawing) return;
-
         const point = getTouchPos(e);
         currentStroke.points.push(point);
 
@@ -84,7 +77,6 @@ export function setupCanvas(canvas){
 
     function draw(e) {
         if (!drawing) return;
-
         const point = getMousePos(e);
         currentStroke.points.push(point);
 
@@ -102,21 +94,17 @@ export function setupCanvas(canvas){
 
     function stopDrawing() {
         if (!drawing) return;
-
         drawing = false;
+        // Store color with each stroke so it renders correctly later
         strokes.push(currentStroke);
     }
 
     function getMousePos(e) {
         const rect = canvas.getBoundingClientRect();
-
-        return {
-            x: e.clientX - rect.left,
-            y: e.clientY - rect.top
-        };
+        return { x: e.clientX - rect.left, y: e.clientY - rect.top };
     }
 
-    // [Lucky] Redraws all strokes — used after canvas resize
+    // Redraws all strokes with their original colors
     function redraw() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         strokes.forEach(stroke => {
@@ -134,7 +122,6 @@ export function setupCanvas(canvas){
         });
     }
 
-    // [Lucky] Initial size + listen for window resize
     resizeCanvas();
     window.addEventListener("resize", resizeCanvas);
 
@@ -156,10 +143,12 @@ export function setupCanvas(canvas){
     });
 
     return {
-    getStrokes: () => strokes,
-    clear: () => {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        strokes = [];
-    }
+        getStrokes: () => strokes,
+        clear: () => {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            strokes = [];
+        },
+        // Allow setting the drawing color from outside
+        setColor: (color) => { currentColor = color; }
     };
 }
